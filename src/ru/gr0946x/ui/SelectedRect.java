@@ -11,24 +11,24 @@ public class SelectedRect {
     private final int y1;
     private int y2;
 
-    public Point getUpperLeft(){
+    public Point getUpperLeft() {
         return new Point(min(x1, x2), min(y1, y2));
     }
 
-    public int getWidth(){
+    public int getWidth() {
         return abs(x1 - x2);
     }
 
-    public int getHeight(){
+    public int getHeight() {
         return abs(y1 - y2);
     }
 
-    public SelectedRect(int x, int y){
+    public SelectedRect(int x, int y) {
         x1 = x2 = x;
         y1 = y2 = y;
     }
 
-    public void setLastPoint(int x, int y){
+    public void setLastPoint(int x, int y) {
         x2 = x;
         y2 = y;
     }

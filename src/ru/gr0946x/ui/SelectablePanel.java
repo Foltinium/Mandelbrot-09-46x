@@ -6,16 +6,16 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
 
-public class SelectablePanel extends PaintPanel{
+public class SelectablePanel extends PaintPanel {
     private SelectedRect rect = null;
     private Graphics g;
 
     private final ArrayList<SelectListener> selectHandlers = new ArrayList<>();
-    public void addSelectListener(SelectListener listener){
+    public void addSelectListener(SelectListener listener) {
         selectHandlers.add(listener);
     }
 
-    public void removeSelectListener(SelectListener listener){
+    public void removeSelectListener(SelectListener listener) {
         selectHandlers.remove(listener);
     }
 
@@ -34,7 +34,7 @@ public class SelectablePanel extends PaintPanel{
             public void mouseReleased(MouseEvent e) {
                 super.mouseReleased(e);
                 paintSelectedRect();
-                for (var handler : selectHandlers) {
+                for (var handler : selectHandlers)
                     handler.onSelect(new Rectangle(
                             rect.getUpperLeft().x,
                             rect.getUpperLeft().y,
@@ -42,9 +42,8 @@ public class SelectablePanel extends PaintPanel{
                             rect.getHeight()
                             )
                     );
-                }
-                rect = null;
 
+                rect = null;
             }
         });
 
@@ -53,9 +52,8 @@ public class SelectablePanel extends PaintPanel{
             public void mouseDragged(MouseEvent e) {
                 super.mouseDragged(e);
                 paintSelectedRect();
-                if (rect != null){
+                if (rect != null)
                     rect.setLastPoint(e.getX(), e.getY());
-                }
                 paintSelectedRect();
             }
         });
@@ -69,8 +67,8 @@ public class SelectablePanel extends PaintPanel{
         });
     }
 
-    private void paintSelectedRect(){
-        if (g != null){
+    private void paintSelectedRect() {
+        if (g != null) {
             g.setXORMode(Color.WHITE);
             g.setColor(Color.BLACK);
             g.drawRect(
