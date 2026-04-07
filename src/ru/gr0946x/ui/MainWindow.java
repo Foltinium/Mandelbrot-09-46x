@@ -1,12 +1,15 @@
 package ru.gr0946x.ui;
 
 import ru.gr0946x.Converter;
+import ru.gr0946x.ui.fractals.FractalState;
 import ru.gr0946x.ui.fractals.Mandelbrot;
 import ru.gr0946x.ui.painting.FractalPainter;
 import ru.gr0946x.ui.painting.Painter;
 
 import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
+import java.io.*;
 
 import static java.lang.Math.*;
 
@@ -48,12 +51,11 @@ public class MainWindow extends JFrame {
             mainPanel.repaint();
         });
 
-        new Menu(this);
+        new Menu(this, conv, mandelbrot);
 
         setContent();
     }
-
-    private void setContent() {
+    private void setContent(){
         var gl = new GroupLayout(getContentPane());
         setLayout(gl);
 
@@ -70,3 +72,4 @@ public class MainWindow extends JFrame {
         );
     }
 }
+
