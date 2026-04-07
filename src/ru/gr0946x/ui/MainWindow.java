@@ -1,12 +1,15 @@
 package ru.gr0946x.ui;
 
 import ru.gr0946x.Converter;
+import ru.gr0946x.ui.fractals.FractalState;
 import ru.gr0946x.ui.fractals.Mandelbrot;
 import ru.gr0946x.ui.painting.FractalPainter;
 import ru.gr0946x.ui.painting.Painter;
 
 import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
+import java.io.*;
 
 import static java.lang.Math.*;
 
@@ -42,8 +45,77 @@ public class MainWindow extends JFrame {
             mainPanel.repaint();
         });
         setContent();
+        initMenu();
+    }
+    private void initMenu() {
+        JMenuBar menuBar = new JMenuBar();
+        JMenu fileMenu = new JMenu("Файл");
+
+        JMenuItem openItem = new JMenuItem("Открыть фрактал...");
+        openItem.addActionListener(e -> openFractal());
+
+        JMenuItem saveItem = new JMenuItem("Сохранить фрактал...");
+        saveItem.addActionListener(e -> saveFractal());
+
+        fileMenu.add(openItem);
+        fileMenu.add(saveItem);
+        menuBar.add(fileMenu);
+
+        setJMenuBar(menuBar);
     }
 
+    private void saveFractal() {
+        JFileChooser fileChooser = new JFileChooser();
+        // Устанавливаем фильтр для .frac
+        fileChooser.setFileFilter(new FileNameExtensionFilter("Файлы фракталов (*.frac)", "frac"));
+        fileChooser.setAcceptAllFileFilterUsed(false);
+
+        if (fileChooser.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
+            File file = fileChooser.getSelectedFile();
+
+            if (!file.getName().toLowerCase().endsWith(".frac")) {
+                file = new File(file.getParentFile(), file.getName() + ".frac");
+            }
+
+            try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(file))) {
+                FractalState state = new FractalState(
+                        conv.getXMin(),
+                        conv.getXMax(),
+                        conv.getYMin(),
+                        conv.getYMax(),
+                        mandelbrot.getMaxIterations()
+                );
+                oos.writeObject(state);
+                JOptionPane.showMessageDialog(this, "Фрактал успешно сохранен!", "Успех", JOptionPane.INFORMATION_MESSAGE);
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(this, "Ошибка сохранения: " + ex.getMessage(), "Ошибка", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }
+
+    // Метод открытия
+    private void openFractal() {
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setFileFilter(new FileNameExtensionFilter("Файлы фракталов (*.frac)", "frac"));
+        fileChooser.setAcceptAllFileFilterUsed(false);
+
+        if (fileChooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
+            File file = fileChooser.getSelectedFile();
+
+            try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
+                FractalState state = (FractalState) ois.readObject();
+
+                conv.setXShape(state.xMin(), state.xMax());
+                conv.setYShape(state.yMin(), state.yMax());
+                mandelbrot.setMaxIterations(state.maxIterations());
+
+                mainPanel.repaint();
+
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(this, "Ошибка загрузки файла: " + ex.getMessage(), "Ошибка", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }
     private void setContent(){
         var gl = new GroupLayout(getContentPane());
         setLayout(gl);
@@ -59,3 +131,4 @@ public class MainWindow extends JFrame {
         );
     }
 }
+
