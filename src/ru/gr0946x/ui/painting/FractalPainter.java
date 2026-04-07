@@ -4,12 +4,32 @@ import ru.gr0946x.Converter;
 import ru.gr0946x.ui.fractals.ColorFunction;
 import ru.gr0946x.ui.fractals.Fractal;
 
+import javax.print.attribute.standard.RequestingUserName;
+import java.awt.image.BufferedImage;
+import java.util.concurrent.*;
+
 import java.awt.*;
 
 public class FractalPainter implements Painter {
+
     private final Fractal fractal;
     private final Converter conv;
+
+    private static final int Thread_Count = Runtime.getRuntime().availableProcessors();
+
+    private final ExecutorService executor = Executors.newFixedThreadPool(Thread_Count);
+
     private final ColorFunction colorFunction;
+
+    private static final int Thread_Count = Runtime.getRuntime().availableProcessors();
+    private final ExecutorService executor = Executors.newFixedThreadPool(Thread_Count);
+
+    public FractalPainter(Fractal f, Converter conv, ColorFunction cf) {
+        this.fractal = f;
+        this.conv = conv;
+        this.colorFunction = cf;
+    }
+
 
     @Override
     public int getWidth() {
@@ -31,23 +51,46 @@ public class FractalPainter implements Painter {
         conv.setHeight(height);
     }
 
-    public FractalPainter(Fractal f, Converter conv, ColorFunction cf) {
-        this.fractal = f;
-        this.conv = conv;
-        this.colorFunction = cf;
-    }
 
     @Override
     public void paint(Graphics g) {
-        var w = getWidth();
-        var h = getHeight();
-        for (int i = 0; i < w; i++)
-            for (int j = 0; j < h; j++) {
-                var x = conv.xScr2Crt(i);
-                var y = conv.yScr2Crt(j);
-                var res = fractal.inSetProbability(x, y);
-                g.setColor(colorFunction.getColor(res));
-                g.drawLine(i, j, i + 1, j);
-            }
+        int w = getWidth();
+        int h = getHeight();
+        if (w <= 0 || h <= 0) return;
+
+        BufferedImage image = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
+
+        int stripHeight = (int) Math.ceil((double) h / Thread_Count);
+        CountDownLatch latch = new CountDownLatch(Thread_Count);
+
+
+        for (int t = 0; t < Thread_Count; t++) {
+            final int rowStart = t * stripHeight;
+            final int rowEnd = Math.min(rowStart + stripHeight, h);
+
+            executor.submit(() -> {
+                try {
+                    for (int j = rowStart; j < rowEnd; j++) {
+                        for (int i = 0; i < w; i++) {
+                            double x = conv.xScr2Crt(i);
+                            double y = conv.yScr2Crt(j);
+                            float res = fractal.inSetProbability(x, y);
+                            image.setRGB(i, j, colorFunction.getColor(res).getRGB());
+                        }
+                    }
+                } finally {
+                    latch.countDown();
+                }
+            });
+        }
+
+        try {
+            latch.await();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+
+        g.drawImage(image, 0, 0, null);
     }
 }
+
