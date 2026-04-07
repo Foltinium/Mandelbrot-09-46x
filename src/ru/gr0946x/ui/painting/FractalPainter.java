@@ -21,8 +21,6 @@ public class FractalPainter implements Painter {
 
     private final ColorFunction colorFunction;
 
-    private static final int Thread_Count = Runtime.getRuntime().availableProcessors();
-    private final ExecutorService executor = Executors.newFixedThreadPool(Thread_Count);
 
     public FractalPainter(Fractal f, Converter conv, ColorFunction cf) {
         this.fractal = f;
