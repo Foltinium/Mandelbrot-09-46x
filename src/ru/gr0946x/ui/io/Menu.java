@@ -3,6 +3,7 @@ package ru.gr0946x.ui.io;
 import ru.gr0946x.Converter;
 import ru.gr0946x.ui.MainWindow;
 import ru.gr0946x.ui.fractals.Mandelbrot;
+import ru.smak.math.Complex;
 
 
 import javax.swing.*;
@@ -91,6 +92,33 @@ public class Menu {
         setColorScheme.add(colorSchemeB);
         setColorScheme.add(colorSchemeC);
 
+        fractalFuncA.addActionListener(e -> window.setCurrentFractal((x, y) -> {
+            // z² + c — классический Мандельброт
+            var c = new Complex(x, y);
+            var z = new Complex();
+            int i = 0;
+            int maxIt = 100;
+            while (z.getAbsoluteValue2() < 4 && ++i < maxIt) {
+                z.timesAssign(z);
+                z.plusAssign(c);
+            }
+            return (float) i / maxIt;
+        }));
+        fractalFuncB.addActionListener(e -> window.setCurrentFractal((x, y) -> {
+            // z⁴ + c
+            var c = new Complex(x, y);
+            var z = new Complex();
+            int i = 0;
+            int maxIt = 100;
+            while (z.getAbsoluteValue2() < 4 && ++i < maxIt) {
+                z.timesAssign(z);
+                z.timesAssign(z);
+                z.plusAssign(c);
+            }
+            return (float) i / maxIt;
+        }));
         return viewMenu;
+
     }
+
 }
