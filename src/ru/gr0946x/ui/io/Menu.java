@@ -9,7 +9,7 @@ public class Menu {
     private final FractalFileManager fileManager;
     private final FractalSerializer fracSerializer;
 
-    public Menu(MainWindow mainWindow, FractalSerializer fracSerializer, FractalFileManager fileManager) {
+    public Menu(MainWindow mainWindow, FractalSerializer fracSerializer, FractalFileManager fileManager, ImageSerializer imageSerializer) {
         this.mainWindow = mainWindow;
         this.fracSerializer = fracSerializer;
         this.fileManager = fileManager;
@@ -34,30 +34,25 @@ public class Menu {
 
         JMenuItem saveAsItem = new JMenuItem("Сохранить как...");
         saveAsItem.addActionListener(e -> mainWindow.saveFractal());
-        saveAsItem.setAccelerator(KeyStroke.getKeyStroke("control S"));
 
-        JMenuItem openFileItem = new JMenuItem("Открыть...");
-        openFileItem.addActionListener(e -> fileManager.open(fracSerializer, mainWindow::repaint));
-        openFileItem.setAccelerator(KeyStroke.getKeyStroke("control O"));
+        JMenuItem openItem = new JMenuItem("Открыть...");
+        openItem.addActionListener(e -> mainWindow.openFile());
 
         JMenuItem createAnimationItem = new JMenuItem("Создать анимацию...");
-        createAnimationItem.setAccelerator(KeyStroke.getKeyStroke("control N"));
 
         fileMenu.add(saveAsItem);
         fileMenu.addSeparator();
-        fileMenu.add(openFileItem);
+        fileMenu.add(openItem);
         fileMenu.addSeparator();
         fileMenu.add(createAnimationItem);
 
         return fileMenu;
     }
-
     private JMenu createEditMenu() {
         JMenu editMenu = new JMenu("Правка");
         editMenu.setMnemonic('E');
 
         JMenuItem undoItem = new JMenuItem("Отменить");
-        undoItem.setAccelerator(KeyStroke.getKeyStroke("control Z"));
 
         editMenu.add(undoItem);
 
@@ -85,7 +80,6 @@ public class Menu {
         JCheckBoxMenuItem adaptiveIterationsItem = new JCheckBoxMenuItem("Адаптивное число итераций");
         adaptiveIterationsItem.addActionListener(e -> mainWindow.setAdaptiveIterationsEnabled(adaptiveIterationsItem.isSelected()));
         adaptiveIterationsItem.setSelected(true);
-        adaptiveIterationsItem.setAccelerator(KeyStroke.getKeyStroke("control I"));
 
         functionGroup.add(fractalFunc1Item);
         functionGroup.add(fractalFunc2Item);
