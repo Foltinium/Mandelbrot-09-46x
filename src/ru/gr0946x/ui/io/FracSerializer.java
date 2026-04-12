@@ -4,11 +4,9 @@ import ru.gr0946x.Converter;
 import ru.gr0946x.ui.fractals.FractalState;
 import ru.gr0946x.ui.fractals.Mandelbrot;
 
-import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
-import java.awt.image.BufferedImage;
 import java.io.*;
 
 public class FracSerializer implements FractalSerializer {
@@ -65,7 +63,7 @@ public class FracSerializer implements FractalSerializer {
         }
     }
 
-    public void saveWithFormatChoice(Component parent, Converter conv, Mandelbrot mandelbrot, JPanel paintPanel) {
+    public void saveWithFormatChoice(Component parent, Converter conv, Mandelbrot mandelbrot, JPanel paintPanel, ImageSerializer imageSerializer) {
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setDialogTitle("Сохранить фрактал");
 
@@ -97,12 +95,13 @@ public class FracSerializer implements FractalSerializer {
                     JOptionPane.showMessageDialog(parent, "Ошибка: " + ex.getMessage(), "Ошибка", JOptionPane.ERROR_MESSAGE);
                 }
             } else if (extension.equals("png")) {
-                saveImage(parent, conv, paintPanel, file, "png");
+                imageSerializer.saveImage(parent, conv, paintPanel, file, "png");
             } else if (extension.equals("jpg")) {
-                saveImage(parent, conv, paintPanel, file, "jpg");
+                imageSerializer.saveImage(parent, conv, paintPanel, file, "jpg");
             }
         }
     }
+
     public void openWithFormatChoice(Component parent, Converter conv, Mandelbrot mandelbrot, JPanel paintPanel, ImageSerializer imageSerializer) {
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setDialogTitle("Открыть файл");
@@ -127,43 +126,20 @@ public class FracSerializer implements FractalSerializer {
                     conv.setXShape(state.xMin(), state.xMax());
                     conv.setYShape(state.yMin(), state.yMax());
                     mandelbrot.setMaxIterations(state.maxIterations());
+
+                    // ОЧИЩАЕМ ИЗОБРАЖЕНИЕ ПЕРЕД ОТКРЫТИЕМ ФРАКТАЛА
+                    imageSerializer.clearImage();
+
                     ((JFrame) parent).repaint();
                     JOptionPane.showMessageDialog(parent, "Фрактал загружен!", "Успех", JOptionPane.INFORMATION_MESSAGE);
                 } catch (Exception ex) {
                     JOptionPane.showMessageDialog(parent, "Ошибка: " + ex.getMessage(), "Ошибка", JOptionPane.ERROR_MESSAGE);
                 }
             } else if (name.endsWith(".png") || name.endsWith(".jpg") || name.endsWith(".jpeg")) {
-                imageSerializer.openImage(parent, paintPanel);
+                imageSerializer.openImage(parent, paintPanel, file);
             } else {
                 JOptionPane.showMessageDialog(parent, "Неподдерживаемый формат", "Ошибка", JOptionPane.ERROR_MESSAGE);
             }
-        }
-    }
-    private void saveImage(Component parent, Converter conv, JPanel paintPanel, File file, String format) {
-        String path = file.getAbsolutePath();
-        if (!path.toLowerCase().endsWith("." + format)) {
-            int dot = path.lastIndexOf(".");
-            path = (dot > 0 ? path.substring(0, dot) : path) + "." + format;
-            file = new File(path);
-        }
-
-        try {
-            BufferedImage image = new BufferedImage(paintPanel.getWidth(), paintPanel.getHeight(), BufferedImage.TYPE_INT_RGB);
-            Graphics2D g = image.createGraphics();
-            paintPanel.paint(g);
-
-            g.setFont(new Font("Monospaced", Font.BOLD, 14));
-            String coords = String.format("Re: [%.5f, %.5f]  Im: [%.5f, %.5f]", conv.getXMin(), conv.getXMax(), conv.getYMin(), conv.getYMax());
-            g.setColor(Color.BLACK);
-            g.drawString(coords, 11, 21);
-            g.setColor(Color.WHITE);
-            g.drawString(coords, 10, 20);
-            g.dispose();
-
-            ImageIO.write(image, format.toUpperCase(), file);
-            JOptionPane.showMessageDialog(parent, "Изображение сохранено!", "Успех", JOptionPane.INFORMATION_MESSAGE);
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(parent, "Ошибка: " + e.getMessage(), "Ошибка", JOptionPane.ERROR_MESSAGE);
         }
     }
 }

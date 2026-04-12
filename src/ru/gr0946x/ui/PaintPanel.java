@@ -13,7 +13,7 @@ public class PaintPanel extends JPanel {
     private Painter painter;
     private ImageSerializer imageSerializer;
 
-    public PaintPanel(Painter painter, ImageSerializer imageSerializer){
+    public PaintPanel(Painter painter, ImageSerializer imageSerializer) {
         this.painter = painter;
         this.imageSerializer = imageSerializer;
         addComponentListener(new ComponentAdapter() {
@@ -28,7 +28,7 @@ public class PaintPanel extends JPanel {
     }
 
     @Override
-    public void paint(Graphics g){
+    public void paint(Graphics g) {
         super.paint(g);
         painter.paint(g);
         if (imageSerializer != null) {

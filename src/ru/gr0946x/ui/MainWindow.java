@@ -46,6 +46,14 @@ public class MainWindow extends JFrame {
         mainPanel.setBackground(Color.WHITE);
 
         mainPanel.addSelectListener((r) -> {
+            if (imageSerializer.isImageMode()) {
+                JOptionPane.showMessageDialog(this,
+                        "Масштабирование недоступно при просмотре изображения.\nОткройте фрактал (.frac) для масштабирования.",
+                        "Предупреждение",
+                        JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
             if (r.width <= 2 || r.height <= 2) {
                 return;
             }
@@ -61,6 +69,7 @@ public class MainWindow extends JFrame {
                 mandelbrot.setMaxIterations(Math.max(100, (int)(100 * (1 + Math.log10(zoomFactor)))));
             }
 
+            imageSerializer.clearImage();
             mainPanel.repaint();
         });
 
@@ -87,7 +96,7 @@ public class MainWindow extends JFrame {
     }
 
     public void saveFractal() {
-        fracSerializer.saveWithFormatChoice(this, conv, mandelbrot, mainPanel);
+        fracSerializer.saveWithFormatChoice(this, conv, mandelbrot, mainPanel, imageSerializer);
     }
 
     public void openFile() {
