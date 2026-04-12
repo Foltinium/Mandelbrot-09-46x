@@ -1,6 +1,9 @@
 package ru.gr0946x.ui.io;
 
+import ru.gr0946x.Converter;
 import ru.gr0946x.ui.MainWindow;
+import ru.gr0946x.ui.fractals.Mandelbrot;
+
 
 import javax.swing.*;
 
@@ -58,6 +61,21 @@ public class Menu {
 
         JMenuItem undoItem = new JMenuItem("Отменить");
         undoItem.setAccelerator(KeyStroke.getKeyStroke("control Z"));
+
+        undoItem.setEnabled(mainWindow.canUndo());
+        undoItem.addActionListener(e -> mainWindow.triggerUndo());
+
+        editMenu.addMenuListener(new javax.swing.event.MenuListener() {
+            @Override
+            public void menuSelected(javax.swing.event.MenuEvent e) {
+                undoItem.setEnabled(mainWindow.canUndo());
+            }
+            @Override
+            public void menuDeselected(javax.swing.event.MenuEvent e) {}
+            @Override
+            public void menuCanceled(javax.swing.event.MenuEvent e) {}
+        });
+
         editMenu.add(undoItem);
         return editMenu;
     }
