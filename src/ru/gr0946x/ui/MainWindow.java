@@ -124,7 +124,7 @@ public class MainWindow extends JFrame {
         }
         mainPanel.repaint();
     }
-}
+
     private void restoreState(FractalState state) {
         conv.setXShape(state.xMin(), state.xMax());
         conv.setYShape(state.yMin(), state.yMax());
