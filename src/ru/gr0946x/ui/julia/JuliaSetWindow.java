@@ -1,7 +1,6 @@
-package ru.gr0946x.ui;
+package ru.gr0946x.ui.julia;
 
 import ru.gr0946x.Converter;
-import ru.gr0946x.ui.fractals.JuliaFractal;
 import ru.gr0946x.ui.painting.FractalPainter;
 import ru.gr0946x.ui.painting.Painter;
 import ru.smak.math.Complex;

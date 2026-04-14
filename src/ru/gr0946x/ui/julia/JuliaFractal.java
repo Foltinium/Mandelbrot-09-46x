@@ -1,5 +1,6 @@
-package ru.gr0946x.ui.fractals;
+package ru.gr0946x.ui.julia;
 
+import ru.gr0946x.ui.fractals.Fractal;
 import ru.smak.math.Complex;
 
 public class JuliaFractal implements Fractal {
