@@ -29,14 +29,9 @@ public class JuliaMenuProvider implements MenuProvider {
         openItem.addActionListener(_ -> juliaWindow.openFile());
         openItem.setAccelerator(KeyStroke.getKeyStroke("control O"));
 
-        JMenuItem createAnimationItem = new JMenuItem("Создать анимацию...");
-        createAnimationItem.setAccelerator(KeyStroke.getKeyStroke("control N"));
-
         fileMenu.add(saveAsItem);
         fileMenu.addSeparator();
         fileMenu.add(openItem);
-        fileMenu.addSeparator();
-        fileMenu.add(createAnimationItem);
 
         return fileMenu;
     }
@@ -65,7 +60,14 @@ public class JuliaMenuProvider implements MenuProvider {
             public void menuCanceled(MenuEvent e) {}
         });
 
+        JCheckBoxMenuItem adaptiveIterationsItem = new JCheckBoxMenuItem("Адаптивное число итераций");
+        adaptiveIterationsItem.addActionListener(_ -> juliaWindow.setAdaptiveIterationsEnabled(adaptiveIterationsItem.isSelected()));
+        adaptiveIterationsItem.setSelected(true);
+        adaptiveIterationsItem.setAccelerator(KeyStroke.getKeyStroke("control I"));
+
         editMenu.add(undoItem);
+        editMenu.addSeparator();
+        editMenu.add(adaptiveIterationsItem);
         return editMenu;
     }
 
@@ -96,14 +98,7 @@ public class JuliaMenuProvider implements MenuProvider {
         setColorSchemeMenu.add(colorScheme2Item);
         setColorSchemeMenu.add(colorScheme3Item);
 
-        JCheckBoxMenuItem adaptiveIterationsItem = new JCheckBoxMenuItem("Адаптивное число итераций");
-        adaptiveIterationsItem.addActionListener(_ -> juliaWindow.setAdaptiveIterationsEnabled(adaptiveIterationsItem.isSelected()));
-        adaptiveIterationsItem.setSelected(true);
-        adaptiveIterationsItem.setAccelerator(KeyStroke.getKeyStroke("control I"));
-
         viewMenu.add(setColorSchemeMenu);
-        viewMenu.addSeparator();
-        viewMenu.add(adaptiveIterationsItem);
 
         return viewMenu;
     }

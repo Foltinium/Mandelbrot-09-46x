@@ -29,14 +29,9 @@ public class MainMenuProvider implements MenuProvider {
         openItem.addActionListener(_ -> mainWindow.openFile());
         openItem.setAccelerator(KeyStroke.getKeyStroke("control O"));
 
-        JMenuItem createAnimationItem = new JMenuItem("Создать анимацию...");
-        createAnimationItem.setAccelerator(KeyStroke.getKeyStroke("control N"));
-
         fileMenu.add(saveAsItem);
         fileMenu.addSeparator();
         fileMenu.add(openItem);
-        fileMenu.addSeparator();
-        fileMenu.add(createAnimationItem);
 
         return fileMenu;
     }
@@ -65,7 +60,14 @@ public class MainMenuProvider implements MenuProvider {
             public void menuCanceled(MenuEvent e) {}
         });
 
+        JCheckBoxMenuItem adaptiveIterationsItem = new JCheckBoxMenuItem("Адаптивное число итераций");
+        adaptiveIterationsItem.addActionListener(_ -> mainWindow.setAdaptiveIterationsEnabled(adaptiveIterationsItem.isSelected()));
+        adaptiveIterationsItem.setSelected(true);
+        adaptiveIterationsItem.setAccelerator(KeyStroke.getKeyStroke("control I"));
+
         editMenu.add(undoItem);
+        editMenu.addSeparator();
+        editMenu.add(adaptiveIterationsItem);
         return editMenu;
     }
 
@@ -107,11 +109,6 @@ public class MainMenuProvider implements MenuProvider {
         setColorSchemeMenu.add(colorScheme3Item);
 
 
-        JCheckBoxMenuItem adaptiveIterationsItem = new JCheckBoxMenuItem("Адаптивное число итераций");
-        adaptiveIterationsItem.addActionListener(_ -> mainWindow.setAdaptiveIterationsEnabled(adaptiveIterationsItem.isSelected()));
-        adaptiveIterationsItem.setSelected(true);
-        adaptiveIterationsItem.setAccelerator(KeyStroke.getKeyStroke("control I"));
-
         // Функции фракталов
         fractalFunc1Item.addActionListener(_ ->
                 mainWindow.setCurrentFractal(lists.getFractalFunctions().getFirst()));
@@ -130,8 +127,6 @@ public class MainMenuProvider implements MenuProvider {
 
         viewMenu.add(setFractalFuncMenu);
         viewMenu.add(setColorSchemeMenu);
-        viewMenu.addSeparator();
-        viewMenu.add(adaptiveIterationsItem);
 
         return viewMenu;
     }
