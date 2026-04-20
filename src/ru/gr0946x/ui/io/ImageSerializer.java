@@ -43,11 +43,47 @@ public class ImageSerializer {
     }
 
     public void saveImage(Component parent, Converter conv, JPanel paintPanel, File file, String format) {
+        // Проверка поддерживаемых форматов
+        if (!format.equals("png") && !format.equals("jpg")) {
+            JOptionPane.showMessageDialog(parent,
+                    "Поддерживаются только форматы PNG и JPEG",
+                    "Ошибка",
+                    JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
         String path = file.getAbsolutePath();
-        if (!path.toLowerCase().endsWith("." + format)) {
-            int dot = path.lastIndexOf(".");
-            path = (dot > 0 ? path.substring(0, dot) : path) + "." + format;
-            file = new File(path);
+        String targetExt = "." + format.toLowerCase();
+
+        // (file.png.png -> file.png)
+        String lowerPath = path.toLowerCase();
+        while (lowerPath.endsWith(targetExt)) {
+            path = path.substring(0, path.length() - (format.length() + 1));
+            lowerPath = path.toLowerCase();
+        }
+
+        boolean hasPng = lowerPath.endsWith(".png");
+        boolean hasJpg = lowerPath.endsWith(".jpg") || lowerPath.endsWith(".jpeg");
+
+        if (format.equals("png") && !hasPng) {
+            path = path + ".png";
+        } else if (format.equals("jpg") && !hasJpg) {
+            path = path + ".jpg";
+        }
+
+        File finalFile = new File(path);
+
+        // запрос на перезапись
+        if (finalFile.exists()) {
+            int result = JOptionPane.showConfirmDialog(parent,
+                    "Файл '" + finalFile.getName() + "' уже существует.\nПерезаписать?",
+                    "Подтверждение сохранения",
+                    JOptionPane.YES_NO_OPTION,
+                    JOptionPane.WARNING_MESSAGE);
+
+            if (result != JOptionPane.YES_OPTION) {
+                return;
+            }
         }
 
         try {
@@ -56,17 +92,25 @@ public class ImageSerializer {
             paintPanel.paint(g);
 
             g.setFont(new Font("Monospaced", Font.BOLD, 14));
-            String coords = String.format("Re: [%.5f, %.5f]  Im: [%.5f, %.5f]", conv.getXMin(), conv.getXMax(), conv.getYMin(), conv.getYMax());
+            String coords = String.format("Re: [%.5f, %.5f]  Im: [%.5f, %.5f]",
+                    conv.getXMin(), conv.getXMax(), conv.getYMin(), conv.getYMax());
+
             g.setColor(Color.BLACK);
             g.drawString(coords, 11, 21);
             g.setColor(Color.WHITE);
             g.drawString(coords, 10, 20);
             g.dispose();
 
-            ImageIO.write(image, format.toUpperCase(), file);
-            JOptionPane.showMessageDialog(parent, "Изображение сохранено!", "Успех", JOptionPane.INFORMATION_MESSAGE);
+            ImageIO.write(image, format.toUpperCase(), finalFile);
+            JOptionPane.showMessageDialog(parent,
+                    "Изображение сохранено как: " + finalFile.getName(),
+                    "Успех",
+                    JOptionPane.INFORMATION_MESSAGE);
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(parent, "Ошибка: " + e.getMessage(), "Ошибка", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(parent,
+                    "Ошибка сохранения: " + e.getMessage(),
+                    "Ошибка",
+                    JOptionPane.ERROR_MESSAGE);
         }
     }
 }

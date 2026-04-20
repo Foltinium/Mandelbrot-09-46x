@@ -19,12 +19,22 @@ public class FracSerializer implements FractalSerializer {
 
         if (fileChooser.showSaveDialog(parent) == JFileChooser.APPROVE_OPTION) {
             File file = fileChooser.getSelectedFile();
+            String finalPath = processFracFileName(file.getAbsolutePath());
+            File finalFile = new File(finalPath);
 
-            if (!file.getName().toLowerCase().endsWith(".frac")) {
-                file = new File(file.getParentFile(), file.getName() + ".frac");
+            if (finalFile.exists()) {
+                int result = JOptionPane.showConfirmDialog(parent,
+                        "Файл '" + finalFile.getName() + "' уже существует.\nПерезаписать?",
+                        "Подтверждение сохранения",
+                        JOptionPane.YES_NO_OPTION,
+                        JOptionPane.WARNING_MESSAGE);
+
+                if (result != JOptionPane.YES_OPTION) {
+                    return;
+                }
             }
 
-            try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(file))) {
+            try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(finalFile))) {
                 FractalState state = new FractalState(
                         conv.getXMin(),
                         conv.getXMax(),
@@ -33,7 +43,7 @@ public class FracSerializer implements FractalSerializer {
                         fractal.getMaxIterations()
                 );
                 oos.writeObject(state);
-                JOptionPane.showMessageDialog(parent, "Фрактал успешно сохранен!", "Успех", JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(parent, "Фрактал успешно сохранен как: " + finalFile.getName(), "Успех", JOptionPane.INFORMATION_MESSAGE);
             } catch (Exception ex) {
                 JOptionPane.showMessageDialog(parent, "Ошибка сохранения: " + ex.getMessage(), "Ошибка", JOptionPane.ERROR_MESSAGE);
             }
@@ -63,15 +73,37 @@ public class FracSerializer implements FractalSerializer {
         }
     }
 
+    private String processFracFileName(String path) {
+        String targetExt = ".frac";
+        String lowerPath = path.toLowerCase();
+
+        while (lowerPath.endsWith(targetExt)) {
+            path = path.substring(0, path.length() - 5);
+            lowerPath = path.toLowerCase();
+        }
+
+        boolean hasFrac = lowerPath.endsWith(".frac");
+
+        if (!hasFrac) {
+            path = path + ".frac";
+        }
+
+        return path;
+    }
+
     public void saveWithFormatChoice(Component parent, Converter conv, QuadraticFractal fractal, JPanel paintPanel, ImageSerializer imageSerializer) {
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setDialogTitle("Сохранить фрактал");
 
-        fileChooser.addChoosableFileFilter(new FileNameExtensionFilter("Файлы фракталов (*.frac)", "frac"));
-        fileChooser.addChoosableFileFilter(new FileNameExtensionFilter("PNG изображения (*.png)", "png"));
-        fileChooser.addChoosableFileFilter(new FileNameExtensionFilter("JPEG изображения (*.jpg)", "jpg"));
+        FileNameExtensionFilter fracFilter = new FileNameExtensionFilter("Файлы фракталов (*.frac)", "frac");
+        FileNameExtensionFilter pngFilter = new FileNameExtensionFilter("PNG изображения (*.png)", "png");
+        FileNameExtensionFilter jpgFilter = new FileNameExtensionFilter("JPEG изображения (*.jpg)", "jpg");
+
+        fileChooser.addChoosableFileFilter(fracFilter);
+        fileChooser.addChoosableFileFilter(pngFilter);
+        fileChooser.addChoosableFileFilter(jpgFilter);
         fileChooser.setAcceptAllFileFilterUsed(true);
-        fileChooser.setFileFilter(fileChooser.getAcceptAllFileFilter());
+        fileChooser.setFileFilter(fracFilter);
 
         if (fileChooser.showSaveDialog(parent) == JFileChooser.APPROVE_OPTION) {
             File file = fileChooser.getSelectedFile();
@@ -82,15 +114,24 @@ public class FracSerializer implements FractalSerializer {
             }
 
             if (extension.equals("frac")) {
-                String path = file.getAbsolutePath();
-                if (!path.toLowerCase().endsWith(".frac")) {
-                    int dot = path.lastIndexOf(".");
-                    path = (dot > 0 ? path.substring(0, dot) : path) + ".frac";
-                    file = new File(path);
+                String finalPath = processFracFileName(file.getAbsolutePath());
+                File finalFile = new File(finalPath);
+
+                if (finalFile.exists()) {
+                    int result = JOptionPane.showConfirmDialog(parent,
+                            "Файл '" + finalFile.getName() + "' уже существует.\nПерезаписать?",
+                            "Подтверждение сохранения",
+                            JOptionPane.YES_NO_OPTION,
+                            JOptionPane.WARNING_MESSAGE);
+
+                    if (result != JOptionPane.YES_OPTION) {
+                        return;
+                    }
                 }
-                try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(file))) {
+
+                try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(finalFile))) {
                     oos.writeObject(new FractalState(conv.getXMin(), conv.getXMax(), conv.getYMin(), conv.getYMax(), fractal.getMaxIterations()));
-                    JOptionPane.showMessageDialog(parent, "Фрактал сохранён!", "Успех", JOptionPane.INFORMATION_MESSAGE);
+                    JOptionPane.showMessageDialog(parent, "Фрактал сохранён как: " + finalFile.getName(), "Успех", JOptionPane.INFORMATION_MESSAGE);
                 } catch (Exception ex) {
                     JOptionPane.showMessageDialog(parent, "Ошибка: " + ex.getMessage(), "Ошибка", JOptionPane.ERROR_MESSAGE);
                 }
@@ -127,11 +168,9 @@ public class FracSerializer implements FractalSerializer {
                     conv.setYShape(state.yMin(), state.yMax());
                     fractal.setMaxIterations(state.maxIterations());
 
-                    // ОЧИЩАЕМ ИЗОБРАЖЕНИЕ ПЕРЕД ОТКРЫТИЕМ ФРАКТАЛА
                     imageSerializer.clearImage();
-
                     ((JFrame) parent).repaint();
-                    JOptionPane.showMessageDialog(parent, "Фрактал загружен!", "Успех", JOptionPane.INFORMATION_MESSAGE);
+                    JOptionPane.showMessageDialog(parent, "Фрактал загружен: " + file.getName(), "Успех", JOptionPane.INFORMATION_MESSAGE);
                 } catch (Exception ex) {
                     JOptionPane.showMessageDialog(parent, "Ошибка: " + ex.getMessage(), "Ошибка", JOptionPane.ERROR_MESSAGE);
                 }
