@@ -15,7 +15,7 @@ import javax.swing.JComponent;
 import javax.swing.*;
 import java.awt.*;
 
-public class MainWindow extends JFrame {
+public class MainWindow extends JFrame implements FractalMenuCallback {
     private final Converter converter;
     private final QuadraticFractal fractal;
     private final FracSerializer fracSerializer;

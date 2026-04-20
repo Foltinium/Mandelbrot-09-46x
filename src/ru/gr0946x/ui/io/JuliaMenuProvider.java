@@ -8,11 +8,11 @@ import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 
 public class JuliaMenuProvider implements MenuProvider {
-    private final JuliaSetWindow juliaWindow;
+    private final FractalMenuCallback fractalMenuCallback;
     private final FunctionAndColorSchemesLists lists;
 
     public JuliaMenuProvider(JuliaSetWindow juliaWindow) {
-        this.juliaWindow = juliaWindow;
+        this.fractalMenuCallback = juliaWindow;
         this.lists = new FunctionAndColorSchemesLists();
     }
 
@@ -22,15 +22,15 @@ public class JuliaMenuProvider implements MenuProvider {
         fileMenu.setMnemonic('F');
 
         JMenuItem saveAsItem = new JMenuItem("Сохранить как...");
-        saveAsItem.addActionListener(_ -> juliaWindow.saveFractal());
+        saveAsItem.addActionListener(_ -> fractalMenuCallback.saveFractal());
         saveAsItem.setAccelerator(KeyStroke.getKeyStroke("control S"));
 
         JMenuItem openItem = new JMenuItem("Открыть...");
-        openItem.addActionListener(_ -> juliaWindow.openFile());
+        openItem.addActionListener(_ -> fractalMenuCallback.openFile());
         openItem.setAccelerator(KeyStroke.getKeyStroke("control O"));
 
         JMenuItem tourItem = new JMenuItem("Экскурсия по фракталу...");
-        tourItem.addActionListener(_ -> juliaWindow.openTourWindow());
+        tourItem.addActionListener(_ -> fractalMenuCallback.openTourWindow());
 
         fileMenu.add(saveAsItem);
         fileMenu.addSeparator();
@@ -49,13 +49,13 @@ public class JuliaMenuProvider implements MenuProvider {
         JMenuItem undoItem = new JMenuItem("Отменить");
         undoItem.setAccelerator(KeyStroke.getKeyStroke("control Z"));
 
-        undoItem.setEnabled(juliaWindow.canUndo());
-        undoItem.addActionListener(_ -> juliaWindow.triggerUndo());
+        undoItem.setEnabled(fractalMenuCallback.canUndo());
+        undoItem.addActionListener(_ -> fractalMenuCallback.triggerUndo());
 
         editMenu.addMenuListener(new MenuListener() {
             @Override
             public void menuSelected(MenuEvent e) {
-                undoItem.setEnabled(juliaWindow.canUndo());
+                undoItem.setEnabled(fractalMenuCallback.canUndo());
             }
 
             @Override
@@ -66,7 +66,7 @@ public class JuliaMenuProvider implements MenuProvider {
         });
 
         JCheckBoxMenuItem adaptiveIterationsItem = new JCheckBoxMenuItem("Адаптивное число итераций");
-        adaptiveIterationsItem.addActionListener(_ -> juliaWindow.setAdaptiveIterationsEnabled(adaptiveIterationsItem.isSelected()));
+        adaptiveIterationsItem.addActionListener(_ -> fractalMenuCallback.setAdaptiveIterationsEnabled(adaptiveIterationsItem.isSelected()));
         adaptiveIterationsItem.setSelected(true);
         adaptiveIterationsItem.setAccelerator(KeyStroke.getKeyStroke("control I"));
 
@@ -89,11 +89,11 @@ public class JuliaMenuProvider implements MenuProvider {
         JRadioButtonMenuItem colorScheme3Item = new JRadioButtonMenuItem("Схема 3");
 
         colorScheme1Item.addActionListener(_ ->
-                juliaWindow.setCurrentColorFunction(lists.getColorSchemes().getFirst()));
+                fractalMenuCallback.setCurrentColorFunction(lists.getColorSchemes().getFirst()));
         colorScheme2Item.addActionListener(_ ->
-                juliaWindow.setCurrentColorFunction(lists.getColorSchemes().get(1)));
+                fractalMenuCallback.setCurrentColorFunction(lists.getColorSchemes().get(1)));
         colorScheme3Item.addActionListener(_ ->
-                juliaWindow.setCurrentColorFunction(lists.getColorSchemes().get(2)));
+                fractalMenuCallback.setCurrentColorFunction(lists.getColorSchemes().get(2)));
 
         colorSchemeGroup.add(colorScheme1Item);
         colorSchemeGroup.add(colorScheme2Item);

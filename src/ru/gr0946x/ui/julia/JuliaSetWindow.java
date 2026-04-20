@@ -1,5 +1,6 @@
 package ru.gr0946x.ui.julia;
 
+import ru.gr0946x.ui.fractals.Fractal;
 import ru.smak.math.Complex;
 import ru.gr0946x.Converter;
 import ru.gr0946x.ui.SelectablePanel;
@@ -20,7 +21,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-public class JuliaSetWindow extends JFrame {
+public class JuliaSetWindow extends JFrame implements FractalMenuCallback {
     private final Converter converter;
     private final QuadraticFractal fractal;
     private final FracSerializer fracSerializer;
@@ -185,6 +186,11 @@ public class JuliaSetWindow extends JFrame {
 
     public void setAdaptiveIterationsEnabled(boolean enabled) {
         this.adaptiveIterationsEnabled = enabled;
+    }
+
+    @Override
+    public void setCurrentFractal(Fractal fractal) {
+
     }
 
     public FractalState captureState() {

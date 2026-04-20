@@ -1,18 +1,17 @@
 package ru.gr0946x.ui.io;
 
 import ru.gr0946x.ui.FunctionAndColorSchemesLists;
-import ru.gr0946x.ui.MainWindow;
 
 import javax.swing.*;
 import javax.swing.event.MenuListener;
 import javax.swing.event.MenuEvent;
 
 public class MainMenuProvider implements MenuProvider {
-    private final MainWindow mainWindow;
+    private final FractalMenuCallback fractalMenuCallback;
     private final FunctionAndColorSchemesLists lists;
 
-    public MainMenuProvider(MainWindow mainWindow) {
-        this.mainWindow = mainWindow;
+    public MainMenuProvider(FractalMenuCallback fractalMenuCallback) {
+        this.fractalMenuCallback = fractalMenuCallback;
         this.lists = new FunctionAndColorSchemesLists();
     }
 
@@ -22,15 +21,15 @@ public class MainMenuProvider implements MenuProvider {
         fileMenu.setMnemonic('F');
 
         JMenuItem saveAsItem = new JMenuItem("Сохранить как...");
-        saveAsItem.addActionListener(_ -> mainWindow.saveFractal());
+        saveAsItem.addActionListener(_ -> fractalMenuCallback.saveFractal());
         saveAsItem.setAccelerator(KeyStroke.getKeyStroke("control S"));
 
         JMenuItem openItem = new JMenuItem("Открыть...");
-        openItem.addActionListener(_ -> mainWindow.openFile());
+        openItem.addActionListener(_ -> fractalMenuCallback.openFile());
         openItem.setAccelerator(KeyStroke.getKeyStroke("control O"));
 
         JMenuItem tourItem = new JMenuItem("Экскурсия по фракталу...");
-        tourItem.addActionListener(_ -> mainWindow.openTourWindow());
+        tourItem.addActionListener(_ -> fractalMenuCallback.openTourWindow());
 
         fileMenu.add(saveAsItem);
         fileMenu.addSeparator();
@@ -49,13 +48,13 @@ public class MainMenuProvider implements MenuProvider {
         JMenuItem undoItem = new JMenuItem("Отменить");
         undoItem.setAccelerator(KeyStroke.getKeyStroke("control Z"));
 
-        undoItem.setEnabled(mainWindow.canUndo());
-        undoItem.addActionListener(_ -> mainWindow.triggerUndo());
+        undoItem.setEnabled(fractalMenuCallback.canUndo());
+        undoItem.addActionListener(_ -> fractalMenuCallback.triggerUndo());
 
         editMenu.addMenuListener(new MenuListener() {
             @Override
             public void menuSelected(MenuEvent e) {
-                undoItem.setEnabled(mainWindow.canUndo());
+                undoItem.setEnabled(fractalMenuCallback.canUndo());
             }
 
             @Override
@@ -66,7 +65,7 @@ public class MainMenuProvider implements MenuProvider {
         });
 
         JCheckBoxMenuItem adaptiveIterationsItem = new JCheckBoxMenuItem("Адаптивное число итераций");
-        adaptiveIterationsItem.addActionListener(_ -> mainWindow.setAdaptiveIterationsEnabled(adaptiveIterationsItem.isSelected()));
+        adaptiveIterationsItem.addActionListener(_ -> fractalMenuCallback.setAdaptiveIterationsEnabled(adaptiveIterationsItem.isSelected()));
         adaptiveIterationsItem.setSelected(true);
         adaptiveIterationsItem.setAccelerator(KeyStroke.getKeyStroke("control I"));
 
@@ -116,19 +115,19 @@ public class MainMenuProvider implements MenuProvider {
 
         // Функции фракталов
         fractalFunc1Item.addActionListener(_ ->
-                mainWindow.setCurrentFractal(lists.getFractalFunctions().getFirst()));
+                fractalMenuCallback.setCurrentFractal(lists.getFractalFunctions().getFirst()));
         fractalFunc2Item.addActionListener(_ ->
-                mainWindow.setCurrentFractal(lists.getFractalFunctions().get(1)));
+                fractalMenuCallback.setCurrentFractal(lists.getFractalFunctions().get(1)));
         fractalFunc3Item.addActionListener(_ ->
-                mainWindow.setCurrentFractal(lists.getFractalFunctions().get(2)));
+                fractalMenuCallback.setCurrentFractal(lists.getFractalFunctions().get(2)));
 
         // Цветовые схемы
         colorScheme1Item.addActionListener(_ ->
-                mainWindow.setCurrentColorFunction(lists.getColorSchemes().getFirst()));
+                fractalMenuCallback.setCurrentColorFunction(lists.getColorSchemes().getFirst()));
         colorScheme2Item.addActionListener(_ ->
-                mainWindow.setCurrentColorFunction(lists.getColorSchemes().get(1)));
+                fractalMenuCallback.setCurrentColorFunction(lists.getColorSchemes().get(1)));
         colorScheme3Item.addActionListener(_ ->
-                mainWindow.setCurrentColorFunction(lists.getColorSchemes().get(2)));
+                fractalMenuCallback.setCurrentColorFunction(lists.getColorSchemes().get(2)));
 
         viewMenu.add(setFractalFuncMenu);
         viewMenu.add(setColorSchemeMenu);
